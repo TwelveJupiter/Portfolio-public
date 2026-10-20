@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HTML</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<style>
+  main { max-width: 820px; }
+  h1, h2, h3 { margin-top: 2rem; margin-bottom: 1rem; }
+  h1:first-child { margin-top: 0; }
+  pre code { font-size: .875rem; }
+  :not(pre) > code { background: var(--bs-tertiary-bg); padding: .1em .35em; border-radius: .25rem; }
+</style>
+</head>
+<body>
+<main class="container py-5">
+<h1>HTML</h1>
+<h2>Estructura</h2>
+<p>Todo documento HTML tiene la siguiente estructura</p>
+<pre class="bg-body-tertiary border rounded p-3"><code>&lt;!DOCTYPE html&gt;
+&lt;html lang="es"&gt;
+&lt;head&gt;
+  &lt;meta charset="UTF-8"&gt;
+  &lt;meta name="viewport" content="width=device-width, initial-scale=1"&gt;
+  &lt;title&gt;Receta de pan amasado&lt;/title&gt;
+  &lt;meta name="description" content="Cómo hacer pan amasado"&gt;
+  &lt;link rel="stylesheet" href="styles.css"&gt;
+&lt;/head&gt;
+&lt;body&gt;
+  &lt;!-- Aquí va todo lo visible --&gt;
+  &lt;script src="app.js" defer&gt;&lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+<p>Ninguna línea está de adorno, todas significan algo</p>
+<ol>
+<li><p><code>&lt;!DOCTYPE html&gt;</code>: Activa el standards mode. Si lo omites, el navegador entra en quirks mode. quirks mode solo existe por el concepto de compatibilidad hacia atrás, es altamente recomendado programar en HTML estándar.</p>
+</li>
+<li><p><code>html lang="es"</code>: Le dice al lector de pantalla con qué pronunciación leer, y al navegador cuándo ofrecer traducción.</p>
+</li>
+<li><p><code>meta charset="UTF-8"</code>: Utiliza la codificación UTF-8 en la escritura. Sin esta línea, las tildes y la ñ pueden aparecer como Ã±.</p>
+</li>
+<li><p><code>meta name="viewport"...</code>: Sin esta línea, un móvil dibuja la página como si midiera ~980px de ancho y la achica entera. El texto queda diminuto y ninguna media query funciona como esperas.</p>
+</li>
+<li><p><code>&lt;title&gt;</code>: Es el texto de la pestaña, del historial y del título azul en los buscadores</p>
+</li>
+<li><p><code>&lt;head&gt;</code> vs <code>&lt;body&gt;</code>: En head va información acerca de la página, <u>que no se ve</u>. En body va lo que se ve.</p>
+</li>
+<li><p><code>defer</code>: El script se descarga en paralelo y se ejecuta cuando el HTML ya está listo.</p>
+</li>
+</ol>
+<h2>Sintaxis</h2>
+<h3>Tipos de texto</h3>
+<p><code>&lt;h1&gt;</code> a <code>&lt;h6&gt;</code> sirven para definir una jerarquía, como el índice de un libro. <strong>No los eliges por el tamaño de letra (eso lo controla CSS), si no por su orden lógico</strong>. Usa un solo <code>&lt;h1&gt;</code> por página y no saltes niveles.</p>
+<h3>Párrafos</h3>
+<p><code>&lt;p&gt;</code> es un párrafo. Sirve solo para saltos de línea con significado dentro de un mismo parrafo, como para separar líneas de una dirección o un poema. <strong>Nunca lo uses para dar espacio, eso es trabajo de CSS</strong>.</p>
+<h3>Estilos de letra</h3>
+<p><code>&lt;strong&gt;</code> vs <code>&lt;b&gt;</code>: <em>strong</em> significa importante y el lector de pantalla lo enfatiza. <code>&lt;b&gt;</code> solo cambia el estilo. Lo mismo pasa con <code>&lt;em&gt;</code> (énfasis) y <code>&lt;i&gt;</code> (estilo).</p>
+<h3>Bloque vs inline</h3>
+<ul>
+<li><p>Los elementos de bloque ocupan toda la línea y empiezan en una nueva (Ej: <code>&lt;h1&gt;</code>, <code>&lt;p&gt;</code>, <code>&lt;div&gt;</code>, <code>&lt;section&gt;</code>).</p>
+</li>
+<li><p>Los elementos inline viven dentro de los de bloque (Ej: <code>&lt;strong&gt;</code>, <code>&lt;em&gt;</code>, <code>&lt;a&gt;</code>, <code>&lt;span&gt;</code>).</p>
+</li>
+</ul>
+<p>Regla de anidamiento: un <code>&lt;p&gt;</code> no puede contener elementos de bloque. Si escribes <code>&lt;p&gt;&lt;div&gt;...&lt;/div&gt;&lt;/p&gt;</code>, el navegador cierra el <code>&lt;p&gt;</code> por su cuenta y tu estructura se rompe sin avisarte.</p>
+<h1>JavaScript</h1>
+<p>JavaScript tiene 7 tipos de datos primitivos, <strong>todo lo demás es un objeto</strong></p>
+<ul>
+<li>string</li>
+<li>number</li>
+<li>bigint</li>
+<li>boolean</li>
+<li>undefined</li>
+<li>null</li>
+<li>symbol</li>
+</ul>
+<p>Para JS, hay varias trampas respecto a los tipos de datos</p>
+<div class="table-responsive"><table class="table table-striped table-bordered align-middle">
+<thead class="table-light">
+<tr>
+<th>valor</th>
+<th>typeof(valor)</th>
+<th>Nota</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>NaN</td>
+<td>number</td>
+<td>"Not a Number" es de tipo number</td>
+</tr>
+<tr>
+<td>undefined</td>
+<td>undefined</td>
+<td></td>
+</tr>
+<tr>
+<td>null</td>
+<td>object</td>
+<td>bug de 1995 que nunca se corrigió</td>
+</tr>
+<tr>
+<td>[]</td>
+<td>object</td>
+<td>útil: Array.isArray([])</td>
+</tr>
+<tr>
+<td>function(){}</td>
+<td>function</td>
+<td>function no es dato primitivo</td>
+</tr>
+</tbody></table></div>
+<p>Estos bugs se deben a que el motor inicial de JS fue hecho en solo 10 días, sin tiempo de revisar.</p>
+
+</main>
+</body>
+</html>
