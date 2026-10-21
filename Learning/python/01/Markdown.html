@@ -1,0 +1,457 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Borrador Markdown</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=Literata:opsz,wght@7..72,400;7..72,600;7..72,700&display=swap">
+<style>
+/* Layout: barra de herramientas arriba, dos paneles lado a lado (fuente | vista previa), barra de estado abajo. */
+:root {
+  --bg: #eef1f4;
+  --surface: #ffffff;
+  --editor-bg: #f7f8fa;
+  --fg: #1c2430;
+  --muted: #5d6877;
+  --line: #d6dce3;
+  --accent: #2f5d8a;
+  --accent-fg: #ffffff;
+  --code-bg: #eef2f6;
+  --font-ui: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  --font-read: "Literata", Georgia, "Times New Roman", serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #12161c; --surface: #1a2029; --editor-bg: #161b23; --fg: #e3e8ee;
+    --muted: #94a0ae; --line: #2c3540; --accent: #7fb0e0; --accent-fg: #0e1620;
+    --code-bg: #232b36; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #12161c; --surface: #1a2029; --editor-bg: #161b23; --fg: #e3e8ee;
+  --muted: #94a0ae; --line: #2c3540; --accent: #7fb0e0; --accent-fg: #0e1620;
+  --code-bg: #232b36; color-scheme: dark;
+}
+
+html, body { height: 100%; }
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-ui);
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  box-sizing: border-box;
+}
+*, *::before, *::after { box-sizing: border-box; }
+
+.app {
+  height: 100%;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  gap: 10px;
+  padding-block: 12px;
+  max-width: 1600px;
+  margin: 0 auto;
+}
+
+/* Toolbar */
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 16px;
+}
+.brand {
+  font-family: var(--font-read);
+  font-weight: 700;
+  font-size: 1.15rem;
+  letter-spacing: -0.01em;
+  margin-right: auto;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+.brand small {
+  font-family: var(--font-mono);
+  font-weight: 400;
+  font-size: 0.72rem;
+  color: var(--muted);
+}
+.fname {
+  display: flex;
+  align-items: center;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  border-radius: 6px;
+  overflow: hidden;
+}
+.fname label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+  padding: 0 8px 0 10px;
+}
+.fname input {
+  border: 0;
+  background: transparent;
+  color: var(--fg);
+  font: 500 0.85rem var(--font-mono);
+  padding: 7px 10px 7px 0;
+  width: 13ch;
+  outline: none;
+}
+.fname:focus-within { border-color: var(--accent); }
+.actions { display: flex; gap: 8px; flex-wrap: wrap; }
+button {
+  font: 500 0.85rem var(--font-ui);
+  border-radius: 6px;
+  padding: 8px 14px;
+  cursor: pointer;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--fg);
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+button:hover { border-color: var(--accent); }
+button.primary { background: var(--accent); color: var(--accent-fg); border-color: var(--accent); }
+button.primary:hover { filter: brightness(1.08); }
+button:focus-visible, textarea:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+button svg { width: 15px; height: 15px; }
+.ext { font-family: var(--font-mono); font-size: 0.8rem; }
+
+/* Panels */
+.panes {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  overflow: hidden;
+  min-height: 0;
+  background: var(--surface);
+}
+.pane { display: flex; flex-direction: column; min-width: 0; min-height: 0; }
+.pane + .pane { border-left: 1px solid var(--line); }
+.pane-head {
+  font: 500 0.7rem var(--font-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+  padding: 8px 16px;
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  justify-content: space-between;
+}
+#src {
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  resize: none;
+  border: 0;
+  background: var(--editor-bg);
+  color: var(--fg);
+  font: 400 0.9rem/1.65 var(--font-mono);
+  padding: 18px 20px;
+  tab-size: 2;
+}
+#src:focus-visible { outline: none; }
+#preview {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 28px 36px 48px;
+}
+
+/* Rendered markdown */
+.md { font-family: var(--font-read); font-size: 1.02rem; line-height: 1.7; max-width: 68ch; margin: 0 auto; overflow-wrap: break-word; }
+.md > :first-child { margin-top: 0; }
+.md h1, .md h2, .md h3, .md h4 { line-height: 1.25; text-wrap: balance; margin: 1.6em 0 0.5em; font-weight: 700; }
+.md h1 { font-size: 2rem; letter-spacing: -0.015em; }
+.md h2 { font-size: 1.45rem; padding-bottom: 0.25em; border-bottom: 1px solid var(--line); }
+.md h3 { font-size: 1.18rem; }
+.md p, .md ul, .md ol, .md blockquote, .md pre, .md table { margin: 0 0 1em; }
+.md a { color: var(--accent); }
+.md code { font-family: var(--font-mono); font-size: 0.86em; background: var(--code-bg); padding: 0.12em 0.35em; border-radius: 4px; }
+.md pre { background: var(--code-bg); padding: 14px 16px; border-radius: 6px; overflow-x: auto; line-height: 1.5; }
+.md pre code { background: none; padding: 0; font-size: 0.84rem; }
+.md blockquote { border-left: 3px solid var(--accent); padding: 0.1em 0 0.1em 1em; color: var(--muted); }
+.md hr { border: 0; border-top: 1px solid var(--line); margin: 2em 0; }
+.md img { max-width: 100%; }
+.md .tbl { overflow-x: auto; margin-bottom: 1em; }
+.md table { border-collapse: collapse; font-family: var(--font-ui); font-size: 0.9rem; font-variant-numeric: tabular-nums; margin: 0; }
+.md th, .md td { border: 1px solid var(--line); padding: 6px 12px; text-align: left; }
+.md th { background: var(--code-bg); font-weight: 600; }
+.md input[type="checkbox"] { margin-right: 0.4em; }
+.md li > p { margin: 0; }
+
+/* Status bar */
+.status {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 18px;
+  font: 400 0.75rem var(--font-mono);
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+.status .msg { margin-left: auto; color: var(--accent); }
+
+@media (max-width: 760px) {
+  html, body { height: auto; }
+  .app { height: auto; }
+  .panes { grid-template-columns: 1fr; }
+  .pane + .pane { border-left: 0; border-top: 1px solid var(--line); }
+  #src { min-height: 45vh; }
+  #preview { padding: 20px 18px 32px; }
+  .brand { width: 100%; }
+}
+</style>
+
+<div class="app">
+  <header class="toolbar">
+    <div class="brand">Borrador <small>markdown</small></div>
+    <div class="fname">
+      <label for="fname">Archivo</label>
+      <input id="fname" type="text" value="documento" spellcheck="false" autocomplete="off">
+    </div>
+    <div class="actions">
+      <button id="dl-md" type="button" title="Descargar el texto fuente">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 2v8M4.5 6.8 8 10.3l3.5-3.5M3 13.5h10"/></svg>
+        Descargar <span class="ext">.md</span>
+      </button>
+      <button id="dl-html" class="primary" type="button" title="Descargar una página web con Bootstrap">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 2v8M4.5 6.8 8 10.3l3.5-3.5M3 13.5h10"/></svg>
+        Descargar <span class="ext">.html</span>
+      </button>
+    </div>
+  </header>
+
+  <main class="panes">
+    <section class="pane">
+      <div class="pane-head"><span>Markdown</span><span id="cursor">Ln 1, Col 1</span></div>
+      <textarea id="src" spellcheck="false" aria-label="Texto en markdown"></textarea>
+    </section>
+    <section class="pane">
+      <div class="pane-head"><span>Vista previa</span><span>en vivo</span></div>
+      <div id="preview"><article class="md" id="out"></article></div>
+    </section>
+  </main>
+
+  <footer class="status">
+    <span id="s-words">0 palabras</span>
+    <span id="s-chars">0 caracteres</span>
+    <span id="s-read">~0 min de lectura</span>
+    <span class="msg" id="s-msg" aria-live="polite"></span>
+  </footer>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/marked/12.0.2/marked.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.1.6/purify.min.js"></script>
+<script>
+(function () {
+  const SAMPLE = `# Notas de la reunión de equipo
+
+Escribe **markdown** a la izquierda y mira el resultado a la derecha. Este texto es un ejemplo: bórralo y empieza el tuyo.
+
+## Lo que funciona
+
+- Títulos con \`#\`, \`##\`, \`###\`
+- **Negrita**, *cursiva* y ~~tachado~~
+- [Enlaces](https://www.markdownguide.org) y \`código en línea\`
+- Listas de tareas:
+  - [x] Revisar el presupuesto
+  - [ ] Enviar el acta
+
+## Una tabla
+
+| Tarea              | Responsable | Plazo   |
+|--------------------|-------------|---------|
+| Diseño de portada  | Camila      | 24 oct  |
+| Revisión de textos | Tomás       | 28 oct  |
+| Publicación        | Valentina   | 2 nov   |
+
+> Las citas se ven así. Sirven para destacar una idea.
+
+\`\`\`python
+def saludo(nombre):
+    return f"Hola, {nombre}"
+\`\`\`
+
+---
+
+Cuando termines, descarga el **.md** para guardar el texto o el **.html** para tener una página web lista para abrir en el navegador.
+`;
+
+  const KEY = "borrador-md:draft";
+  const src = document.getElementById("src");
+  const out = document.getElementById("out");
+  const preview = document.getElementById("preview");
+  const fname = document.getElementById("fname");
+  const msg = document.getElementById("s-msg");
+
+  marked.setOptions({ gfm: true, breaks: false });
+
+  function renderHTML(md) {
+    const raw = marked.parse(md);
+    return DOMPurify.sanitize(raw, { ADD_ATTR: ["target"] });
+  }
+
+  // Load draft
+  let initial = SAMPLE;
+  try {
+    const saved = localStorage.getItem(KEY);
+    if (saved !== null) initial = saved;
+    const savedName = localStorage.getItem(KEY + ":name");
+    if (savedName) fname.value = savedName;
+  } catch (e) {}
+  src.value = initial;
+
+  let saveTimer;
+  function update() {
+    const md = src.value;
+    out.innerHTML = renderHTML(md);
+    out.querySelectorAll("table").forEach(t => {
+      const w = document.createElement("div");
+      w.className = "tbl";
+      t.parentNode.insertBefore(w, t);
+      w.appendChild(t);
+    });
+    out.querySelectorAll("a[href^='http']").forEach(a => { a.target = "_blank"; a.rel = "noopener"; });
+    const text = md.replace(/```[\s\S]*?```/g, " ").replace(/[#>*_`\-|\[\]()~]/g, " ");
+    const words = (text.match(/[\p{L}\p{N}]+/gu) || []).length;
+    document.getElementById("s-words").textContent = words.toLocaleString("es-CL") + (words === 1 ? " palabra" : " palabras");
+    document.getElementById("s-chars").textContent = md.length.toLocaleString("es-CL") + " caracteres";
+    document.getElementById("s-read").textContent = "~" + Math.max(words ? 1 : 0, Math.round(words / 200)) + " min de lectura";
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(() => { try { localStorage.setItem(KEY, md); } catch (e) {} }, 400);
+  }
+
+  function updateCursor() {
+    const before = src.value.slice(0, src.selectionStart);
+    const lines = before.split("\n");
+    document.getElementById("cursor").textContent = "Ln " + lines.length + ", Col " + (lines[lines.length - 1].length + 1);
+  }
+
+  src.addEventListener("input", () => { update(); updateCursor(); });
+  src.addEventListener("keyup", updateCursor);
+  src.addEventListener("click", updateCursor);
+  fname.addEventListener("input", () => { try { localStorage.setItem(KEY + ":name", fname.value); } catch (e) {} });
+
+  // Tab inserts two spaces
+  src.addEventListener("keydown", e => {
+    if (e.key === "Tab" && !e.shiftKey && !e.ctrlKey && !e.metaKey) {
+      e.preventDefault();
+      const s = src.selectionStart, end = src.selectionEnd;
+      src.setRangeText("  ", s, end, "end");
+      update();
+    }
+  });
+
+  // Proportional scroll sync: editor drives preview
+  src.addEventListener("scroll", () => {
+    const max = src.scrollHeight - src.clientHeight;
+    const ratio = max > 0 ? src.scrollTop / max : 0;
+    preview.scrollTop = ratio * (preview.scrollHeight - preview.clientHeight);
+  });
+
+  // ---------- Export ----------
+  function baseName() {
+    const n = fname.value.trim().replace(/\.(md|html?)$/i, "").replace(/[\\/:*?"<>|]+/g, "-");
+    return n || "documento";
+  }
+
+  function escapeHTML(s) {
+    return s.replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+  }
+
+  function buildBootstrapPage(md) {
+    const doc = new DOMParser().parseFromString("<div id='r'>" + renderHTML(md) + "</div>", "text/html");
+    const root = doc.getElementById("r");
+    root.querySelectorAll("table").forEach(t => {
+      t.className = "table table-striped table-bordered align-middle";
+      const th = t.querySelector("thead"); if (th) th.className = "table-light";
+      const w = doc.createElement("div"); w.className = "table-responsive";
+      t.parentNode.insertBefore(w, t); w.appendChild(t);
+    });
+    root.querySelectorAll("blockquote").forEach(b => b.className = "blockquote border-start border-4 border-primary-subtle ps-3 text-body-secondary");
+    root.querySelectorAll("img").forEach(i => i.className = "img-fluid rounded");
+    root.querySelectorAll("pre").forEach(p => p.className = "bg-body-tertiary border rounded p-3");
+    root.querySelectorAll("hr").forEach(h => h.className = "my-5");
+    root.querySelectorAll("li > input[type=checkbox]").forEach(c => { c.className = "form-check-input me-2"; c.closest("li").style.listStyle = "none"; });
+
+    const h1 = root.querySelector("h1");
+    const title = escapeHTML(h1 ? h1.textContent.trim() : baseName());
+
+    return `<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>${title}</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<style>
+  main { max-width: 820px; }
+  h1, h2, h3 { margin-top: 2rem; margin-bottom: 1rem; }
+  h1:first-child { margin-top: 0; }
+  pre code { font-size: .875rem; }
+  :not(pre) > code { background: var(--bs-tertiary-bg); padding: .1em .35em; border-radius: .25rem; }
+</style>
+</head>
+<body>
+<main class="container py-5">
+${root.innerHTML}
+</main>
+</body>
+</html>
+`;
+  }
+
+  let downloadsP = window.claude && window.claude.use ? window.claude.use("downloads").catch(() => null) : Promise.resolve(null);
+
+  function flash(text) {
+    msg.textContent = text;
+    clearTimeout(flash.t);
+    flash.t = setTimeout(() => { msg.textContent = ""; }, 3500);
+  }
+
+  async function offer(filename, content, mime) {
+    const dl = await downloadsP;
+    if (dl) {
+      try {
+        await dl.save({ filename, data: content });
+        flash("Descargado: " + filename);
+      } catch (err) {
+        const code = err && err.code;
+        if (code === "declined") flash("Descarga cancelada");
+        else if (code === "rate_limited") flash("Hay una descarga pendiente. Intenta de nuevo en un momento.");
+        else flash("No se pudo descargar en esta vista.");
+      }
+      return;
+    }
+    // Fallback when the page is opened directly in a browser
+    try {
+      const url = URL.createObjectURL(new Blob([content], { type: mime }));
+      const a = document.createElement("a");
+      a.href = url; a.download = filename;
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+      flash("Descargado: " + filename);
+    } catch (e) {
+      flash("No se pudo descargar en esta vista.");
+    }
+  }
+
+  document.getElementById("dl-md").addEventListener("click", () => {
+    offer(baseName() + ".md", src.value, "text/markdown;charset=utf-8");
+  });
+  document.getElementById("dl-html").addEventListener("click", () => {
+    offer(baseName() + ".html", buildBootstrapPage(src.value), "text/html;charset=utf-8");
+  });
+
+  update();
+  updateCursor();
+})();
+</script>
+
+</body></html>
